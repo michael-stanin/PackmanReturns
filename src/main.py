@@ -1,11 +1,18 @@
 import pygame
+import random
 
 from packman import *
+from layout import *
+from pellet import *
+
+CAPTION                  = "Packman Returns"
+BACKGROUND_IMAGE_FILE    = "../resources/backgrounds/2.jpg"
+PACKMAN_IMAGE_FILE       = "../resources/sprites/24x24packman.png"
+LEVEL_ONE_GRID_FILE      = "../resources/levels/1/"
+PELLET_IMAGE_FILE        = "../resources/sprites/pellet.png"
+BLOCK_IMAGE_FILE         = "../resources/sprites/wall.png"
 
 
-CAPTION            = "Packman Returns"
-BACKGROUND_IMAGE   = "../resources/backgrounds/2.jpg"
-PACKMAN_IMAGE_FILE = "../resources/sprites/24x24packman.png"
 
 class Game:
 
@@ -13,13 +20,13 @@ class Game:
         self.status      = True
         self.size        = (WIDTH, HEIGHT)
         self.caption     = CAPTION
-        self.dirty_rects = []
+        self.score       = ZERO
+        self.dirty_rects = pygame.sprite.Group()
 
     def start(self):
-        self._init_pygame()
+        self.layout = Layout(LEVEL_ONE_GRID_FILE)
 
-        self.background = pygame.image.load(BACKGROUND_IMAGE)
-        self.dirty_rects.append(self.background.get_rect())
+        self._init_pygame()
 
         self._load_sprites()
 
@@ -29,13 +36,16 @@ class Game:
             # Limit frame speed to 60 FPS.
             time_passed = clock.tick(60)
 
+            # Handle key events.
             for event in pygame.event.get():
                 self._on_event(event)
 
+            # Update all of the needed sprites
             self._on_loop()
 
             self._on_render()
 
+        # Close app.
         self._on_cleanup()
 
     def _init_pygame(self):
@@ -47,17 +57,41 @@ class Game:
         if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and
             event.key == K_ESCAPE):
             self.status = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                self.packman.changespeed(-PACKMAN_STEP, 0)
+            elif event.key == pygame.K_RIGHT:
+                self.packman.changespeed(PACKMAN_STEP, 0)
+            elif event.key == pygame.K_UP:
+                self.packman.changespeed(0, -PACKMAN_STEP)
+            elif event.key == pygame.K_DOWN:
+                self.packman.changespeed(0, PACKMAN_STEP)
+ 
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                self.packman.changespeed(PACKMAN_STEP, 0)
+            elif event.key == pygame.K_RIGHT:
+                self.packman.changespeed(-PACKMAN_STEP, 0)
+            elif event.key == pygame.K_UP:
+                self.packman.changespeed(0, PACKMAN_STEP)
+            elif event.key == pygame.K_DOWN:
+                self.packman.changespeed(0, -PACKMAN_STEP)
         
 
     def _on_loop(self):
-        self.screen.blit(self.background, ZERO_POINT)
+        self.screen.fill(BLACK_COLOR)
 
-        self.packman_sprites.update()
-        self.packman_sprites.draw(self.screen)
+        self.dirty_rects.update()
+        self.dirty_rects.draw(self.screen)
+
+        #pellets_collected = pygame.sprite.spritecollide(self.packman, self.pellets, True)
+        #self._track_score(pellets_collected)
 
         pygame.display.flip()
-        pygame.display.update(self.dirty_rects)
 
+    def _track_score(self, pellets):
+        for pellet in pellets:
+            self.score += 1
 
     def _on_render(self):
         pass
@@ -66,27 +100,49 @@ class Game:
         pygame.quit()
 
     def _load_sprites(self):
-        self._load_packman()
 
         self._load_ghosts()
 
         self._load_walls()
 
-        self._load_pellets()
+        #self._load_pellets()
+
+        self._load_packman()
 
     def _load_packman(self):
-        self.packman = Packman(PACKMAN_IMAGE_FILE, pygame.sprite.Group())
-        self.packman_sprites = pygame.sprite.RenderPlain(self.packman)
-        self.dirty_rects.append(self.packman.image.get_rect())
+        self.packman = Packman(400, 320, PACKMAN_IMAGE_FILE)
+        self.packman.blocks = self.blocks
+        self.dirty_rects.add(self.packman)
         
     def _load_ghosts(self):
         pass
 
     def _load_walls(self):
-        pass
+        self.blocks = pygame.sprite.Group()
+        blocks_layout = self.layout.read_layout(BLOCKS_LAYOUT_FILE)
+
+        for line in blocks_layout:
+            block = Block(int(line[0]),
+                          int(line[1]),
+                          int(line[2]),
+                          int(line[3]))
+            self.blocks.add(block)
+            self.dirty_rects.add(block)
+
 
     def _load_pellets(self):
-        pass
+        self.pellets = pygame.sprite.Group()
+
+        for i in range(270):
+            pellet = Pellet(PELLET_IMAGE_FILE)
+
+            pellet.rect.x = random.randrange(WIDTH)
+            pellet.rect.y = random.randrange(HEIGHT)
+
+            self.pellets.add(pellet)
+            self.dirty_rects.add(pellet)
+
+
 
 game = Game()
 game.start()

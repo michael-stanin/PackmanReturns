@@ -1,60 +1,83 @@
-import pygame
-from pygame.locals import *
+from block import *
 
 
 RIGHT_ANGLE_DEGREES = 90
 ZERO_POINT          = (0, 0)
 ZERO                = 0
-WIDTH               = 960
+WIDTH               = 800
 HEIGHT              = 640
-PACKMAN_STEP        = 8
+PACKMAN_STEP        = 5
+BLACK_COLOR         = (0, 0, 0)
 
 class Packman(pygame.sprite.Sprite):
 
-    def __init__(self, image=None, *groups):
-        super(Packman, self).__init__(*groups)
+    def __init__(self, x, y, image=None):
+        super().__init__()
+        self.image = pygame.image.load(image)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.pellets      = ZERO
-        self.image        = pygame.image.load(image)
         self.image_right  = self.image
         self.image_left   = pygame.transform.flip(self.image, True, False)
         self.image_up     = pygame.transform.rotate(self.image, RIGHT_ANGLE_DEGREES)
         self.image_down   = pygame.transform.rotate(self.image, -RIGHT_ANGLE_DEGREES)
-        self.rect         = pygame.rect.Rect(ZERO_POINT, self.image.get_size())
+        self.blocks       = None#pygame.sprite.Group()
+        # Set speed vector
+        self.change_x     = ZERO
+        self.change_y     = ZERO
+
+    def changespeed(self, x, y):
+        """ Change the speed of the player. """
+        self.change_x += x
+        self.change_y += y
 
     def update(self):
         key = pygame.key.get_pressed()
-        # Actual movement.
-        self._movement(key)
+        self.test_movement(key)
 
-        # Restrictions
-        self._restrictions()
-
-    def _restrictions(self):
-        self._window_restrictions()
-
-    def _window_restrictions(self):
-        if self.rect.y + PACKMAN_STEP >= HEIGHT:
-            self.rect.y = HEIGHT - PACKMAN_STEP - self.image.get_size()[1]
-        elif self.rect.y <= ZERO:
-            self.rect.y = ZERO
-        if self.rect.x + PACKMAN_STEP >= WIDTH:
-            self.rect.x = WIDTH - PACKMAN_STEP - self.image.get_size()[0] 
-        if self.rect.x <= ZERO:
-            self.rect.x = ZERO
-
-    def _movement(self, key):
+    def _change_direction(self, key):
         if key[pygame.K_LEFT]:
-            self.rect.x -= PACKMAN_STEP
             self.image = self.image_left
         elif key[pygame.K_RIGHT]:
-            self.rect.x += PACKMAN_STEP
             self.image = self.image_right
         elif key[pygame.K_UP]:
-            self.rect.y -= PACKMAN_STEP
             self.image = self.image_up
         elif key[pygame.K_DOWN]:
-            self.rect.y += PACKMAN_STEP
             self.image = self.image_down
+
+    def _collide_with_blocks_x(self, key):
+        # Did this update cause us to hit a wall?
+        blocks_hit = pygame.sprite.spritecollide(self, self.blocks, False)
+        for block in blocks_hit:
+            # If we are moving right, set our right side to the left side of
+            # the item we hit
+            if key[pygame.K_RIGHT]:
+                self.rect.right = block.rect.left
+            else:
+                # Otherwise if we are moving left, do the opposite.
+                self.rect.left = block.rect.right
+
+    def _collide_with_blocks_y(self, key):
+        # Check and see if we hit anything
+        blocks_hit = pygame.sprite.spritecollide(self, self.blocks, False)
+        for block in blocks_hit:
  
-    def collide(self, other):
-        pass
+            # Reset our position based on the top/bottom of the object.
+            if key[pygame.K_DOWN]:
+                self.rect.bottom = block.rect.top
+            else:
+                self.rect.top = block.rect.bottom
+
+    def test_movement(self, key):
+        self._change_direction(key)
+
+        # Move left/right
+        self.rect.x += self.change_x
+
+        self._collide_with_blocks_x(key)
+ 
+        # Move up/down
+        self.rect.y += self.change_y
+ 
+        self._collide_with_blocks_y(key)
