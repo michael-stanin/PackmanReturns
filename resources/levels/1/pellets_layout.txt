@@ -1,0 +1,3 @@
+25 25 1                                      - row 1, pellet 1
+40 25 0                                      - row 1, pellet 2
+55 25 0                                      - row 1, pellet 3

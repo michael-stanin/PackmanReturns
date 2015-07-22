@@ -84,9 +84,6 @@ class Game:
         self.dirty_rects.update()
         self.dirty_rects.draw(self.screen)
 
-        #pellets_collected = pygame.sprite.spritecollide(self.packman, self.pellets, True)
-        #self._track_score(pellets_collected)
-
         pygame.display.flip()
 
     def _track_score(self, pellets):
@@ -105,13 +102,14 @@ class Game:
 
         self._load_walls()
 
-        #self._load_pellets()
+        self._load_pellets()
 
         self._load_packman()
 
     def _load_packman(self):
         self.packman = Packman(400, 320, PACKMAN_IMAGE_FILE)
         self.packman.blocks = self.blocks
+        self.packman.pellets = self.pellets
         self.dirty_rects.add(self.packman)
         
     def _load_ghosts(self):
@@ -132,12 +130,12 @@ class Game:
 
     def _load_pellets(self):
         self.pellets = pygame.sprite.Group()
+        pellets_layout = self.layout.read_layout(PELLETS_LAYOUT_FILE)
 
-        for i in range(270):
-            pellet = Pellet(PELLET_IMAGE_FILE)
-
-            pellet.rect.x = random.randrange(WIDTH)
-            pellet.rect.y = random.randrange(HEIGHT)
+        for line in pellets_layout:
+            pellet = Pellet(int(line[0]),
+                            int(line[1]),
+                            int(line[2]), self.screen)
 
             self.pellets.add(pellet)
             self.dirty_rects.add(pellet)

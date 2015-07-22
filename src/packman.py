@@ -13,19 +13,20 @@ class Packman(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image=None):
         super().__init__()
-        self.image = pygame.image.load(image)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.pellets      = ZERO
-        self.image_right  = self.image
-        self.image_left   = pygame.transform.flip(self.image, True, False)
-        self.image_up     = pygame.transform.rotate(self.image, RIGHT_ANGLE_DEGREES)
-        self.image_down   = pygame.transform.rotate(self.image, -RIGHT_ANGLE_DEGREES)
-        self.blocks       = None#pygame.sprite.Group()
+        self.image             = pygame.image.load(image)
+        self.rect              = self.image.get_rect()
+        self.rect.x            = x
+        self.rect.y            = y
+        self.pellets_collected = ZERO
+        self.image_right       = self.image
+        self.image_left        = pygame.transform.flip(self.image, True, False)
+        self.image_up          = pygame.transform.rotate(self.image, RIGHT_ANGLE_DEGREES)
+        self.image_down        = pygame.transform.rotate(self.image, -RIGHT_ANGLE_DEGREES)
+        self.blocks            = None
+        self.pellets           = None
         # Set speed vector
-        self.change_x     = ZERO
-        self.change_y     = ZERO
+        self.change_x          = ZERO
+        self.change_y          = ZERO
 
     def changespeed(self, x, y):
         """ Change the speed of the player. """
@@ -75,9 +76,13 @@ class Packman(pygame.sprite.Sprite):
         # Move left/right
         self.rect.x += self.change_x
 
+        pellets_collected = pygame.sprite.spritecollide(self, self.pellets, True)
+
         self._collide_with_blocks_x(key)
  
         # Move up/down
         self.rect.y += self.change_y
- 
+
+        pellets_collected = pygame.sprite.spritecollide(self, self.pellets, True)
+        
         self._collide_with_blocks_y(key)
