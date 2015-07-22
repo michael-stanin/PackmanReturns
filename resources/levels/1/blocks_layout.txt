@@ -2,7 +2,7 @@
 790 10 10 630                                 - right border
 10 630 800 10                                 - bottom border
 0 0 10 640                                    - left border
-35 35 100 50								  - column 1, rec 1
+35 35 100 50                                  - column 1, rec 1
 35 110 100 25                                 - column 1, rec 2
 10 170 125 80                                 - column 1, rec 3
 10 275 125 80                                 - column 1, rec 4
