@@ -18,8 +18,8 @@
 245 460 25 90                                 - column 2, rec 6
 165 505 25 75                                 - column 2, rec 7
 295 35 200 50                                 - column 3, rec 1
-295 115 200 25                                - column 3, rec 2
-385 140 25 75                                 - column 3, rec 3
+295 110 200 25                                - column 3, rec 2
+385 135 25 75                                 - column 3, rec 3
 305 245 80 10                                 - column 3, rec 4
 410 245 85 10                                 - column 3, rec 5
 295 245 10 100                                - column 3, rec 6

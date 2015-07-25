@@ -1,17 +1,25 @@
 import pygame
 import random
 
-from packman import *
-from layout import *
-from pellet import *
+from pygame.locals import *
+from block   import Block
+from packman import Packman
+from layout  import Layout
+from pellet  import Pellet
+from colors  import BLACK
 
 CAPTION                  = "Packman Returns"
 BACKGROUND_IMAGE_FILE    = "../resources/backgrounds/2.jpg"
-PACKMAN_IMAGE_FILE       = "../resources/sprites/24x24packman.png"
-LEVEL_ONE_GRID_FILE      = "../resources/levels/1/"
-PELLET_IMAGE_FILE        = "../resources/sprites/pellet.png"
-BLOCK_IMAGE_FILE         = "../resources/sprites/wall.png"
 
+LEVEL_ONE_GRID_FOLDER    = "../resources/levels/1/"
+
+BLOCKS_LAYOUT_FILE       = "blocks_layout.txt"
+PELLETS_LAYOUT_FILE      = "pellets_layout.txt"
+
+PACKMAN_STEP             = 5
+
+WIDTH                    = 800
+HEIGHT                   = 640
 
 
 class Game:
@@ -20,11 +28,10 @@ class Game:
         self.status      = True
         self.size        = (WIDTH, HEIGHT)
         self.caption     = CAPTION
-        self.score       = ZERO
         self.dirty_rects = pygame.sprite.Group()
 
     def start(self):
-        self.layout = Layout(LEVEL_ONE_GRID_FILE)
+        self.layout = Layout(LEVEL_ONE_GRID_FOLDER)
 
         self._init_pygame()
 
@@ -57,6 +64,7 @@ class Game:
         if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and
             event.key == K_ESCAPE):
             self.status = False
+
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 self.packman.changespeed(-PACKMAN_STEP, 0)
@@ -79,16 +87,12 @@ class Game:
         
 
     def _on_loop(self):
-        self.screen.fill(BLACK_COLOR)
+        self.screen.fill(BLACK)
 
         self.dirty_rects.update()
         self.dirty_rects.draw(self.screen)
 
         pygame.display.flip()
-
-    def _track_score(self, pellets):
-        for pellet in pellets:
-            self.score += 1
 
     def _on_render(self):
         pass
@@ -107,7 +111,7 @@ class Game:
         self._load_packman()
 
     def _load_packman(self):
-        self.packman = Packman(400, 320, PACKMAN_IMAGE_FILE)
+        self.packman = Packman(400, 320)
         self.packman.blocks = self.blocks
         self.packman.pellets = self.pellets
         self.dirty_rects.add(self.packman)
@@ -135,11 +139,10 @@ class Game:
         for line in pellets_layout:
             pellet = Pellet(int(line[0]),
                             int(line[1]),
-                            int(line[2]), self.screen)
+                            int(line[2]))
 
             self.pellets.add(pellet)
             self.dirty_rects.add(pellet)
-
 
 
 game = Game()

@@ -1,6 +1,4 @@
 
-PELLET_FILE = "../resources/sprites/pellet.png"
-WALL_FILE   = "../resources/sprites/wall.png"
 
 BLOCKS_LAYOUT_FILE = "blocks_layout.txt"
 PELLETS_LAYOUT_FILE = "pellets_layout.txt"
@@ -20,3 +18,4 @@ class Layout:
 
 
 #layout = Layout("../resources/levels/1/blocks_layout.txt")
+
