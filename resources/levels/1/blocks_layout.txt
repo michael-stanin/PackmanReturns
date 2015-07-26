@@ -25,8 +25,8 @@
 295 245 10 100                                - column 3, rec 6
 485 245 10 90                                 - column 3, rec 7
 305 335 190 10                                - column 3, rec 8
-295 370 200 25                                - column 3, rec 9
-385 395 25 75                                 - column 3, rec 10
+295 380 200 25                                - column 3, rec 9
+385 405 25 65                                 - column 3, rec 10
 295 495 200 25                                - column 3, rec 11
 385 520 25 85                                 - column 3, rec 12
 525 35 100 50                                 - column 4, rec 1

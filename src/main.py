@@ -4,6 +4,7 @@ import random
 from pygame.locals import *
 from block   import Block
 from packman import Packman
+from blinky  import Blinky
 from layout  import Layout
 from pellet  import Pellet
 from colors  import BLACK
@@ -102,13 +103,13 @@ class Game:
 
     def _load_sprites(self):
 
-        self._load_ghosts()
-
         self._load_walls()
 
         self._load_pellets()
 
         self._load_packman()
+
+        self._load_ghosts()
 
     def _load_packman(self):
         self.packman = Packman(400, 320)
@@ -117,7 +118,14 @@ class Game:
         self.dirty_rects.add(self.packman)
         
     def _load_ghosts(self):
-        pass
+        self.ghosts = pygame.sprite.Group()
+        for x in [340, 370, 400, 430]:
+            ghost = Blinky(x, 290, self.packman.pos)
+
+            self.ghosts.add(ghost)
+            self.dirty_rects.add(ghost)
+
+
 
     def _load_walls(self):
         self.blocks = pygame.sprite.Group()
