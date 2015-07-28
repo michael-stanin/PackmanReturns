@@ -33,11 +33,11 @@ class Packman(gameobj.GameObj):
         self.anim_pacmanCurrent = {}
         
         for i in range(1, 9, 1):
-            self.anim_pacmanR[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "pacman-r " + str(i) + ".gif").convert_alpha()
+            self.anim_pacmanR[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "packman-r " + str(i) + ".gif").convert_alpha()
             self.anim_pacmanL[i] = gameobj.pygame.transform.flip(self.anim_pacmanR[i], True, False)
             self.anim_pacmanU[i] = gameobj.pygame.transform.rotate(self.anim_pacmanR[i], RIGHT_ANGLE_DEGREES)
             self.anim_pacmanD[i] = gameobj.pygame.transform.rotate(self.anim_pacmanR[i], -RIGHT_ANGLE_DEGREES)
-            self.anim_pacmanS[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "pacman.gif").convert_alpha()
+            self.anim_pacmanS[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "packman.gif").convert_alpha()
 
         # Initialize default one.
         self.anim_pacmanCurrent = self.anim_pacmanR
