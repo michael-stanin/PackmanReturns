@@ -1,27 +1,46 @@
 import gameobj
 
 
-RIGHT_ANGLE_DEGREES = 90
-ZERO_POINT          = (0, 0)
-ZERO                = 0
-PACKMAN_IMAGE_FILE  = "../resources/sprites/24x24packman.png"
-
+RIGHT_ANGLE_DEGREES       = 90
+ZERO_POINT                = (0, 0)
+ZERO                      = 0
+ANIMATION_FRAME_DEFAULT   = 1
+PACKMAN_IMAGE_FILE        = "../resources/sprites/24x24packman2.png"
+PACKMAN_SPRITES_FOLDER    = "../resources/sprites/"
 
 class Packman(gameobj.GameObj):
 
     def __init__(self, x, y):
         super(Packman, self).__init__(x, y, PACKMAN_IMAGE_FILE)
-        self.image_right       = self.image
-        self.image_left        = gameobj.pygame.transform.flip(self.image, True, False)
-        self.image_up          = gameobj.pygame.transform.rotate(self.image, RIGHT_ANGLE_DEGREES)
-        self.image_down        = gameobj.pygame.transform.rotate(self.image, -RIGHT_ANGLE_DEGREES)
+        self._set_images()
         self.blocks            = None
         self.pellets           = None
         self.pellets_collected = ZERO
 
+        self.animFrame         = ANIMATION_FRAME_DEFAULT
+
         # Set speed vector
         self.change_x          = ZERO
         self.change_y          = ZERO
+
+    def _set_images(self):
+
+        self.anim_pacmanL = {}
+        self.anim_pacmanR = {}
+        self.anim_pacmanU = {}
+        self.anim_pacmanD = {}
+        self.anim_pacmanS = {}
+        self.anim_pacmanCurrent = {}
+        
+        for i in range(1, 9, 1):
+            self.anim_pacmanR[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "pacman-r " + str(i) + ".gif").convert_alpha()
+            self.anim_pacmanL[i] = gameobj.pygame.transform.flip(self.anim_pacmanR[i], True, False)
+            self.anim_pacmanU[i] = gameobj.pygame.transform.rotate(self.anim_pacmanR[i], RIGHT_ANGLE_DEGREES)
+            self.anim_pacmanD[i] = gameobj.pygame.transform.rotate(self.anim_pacmanR[i], -RIGHT_ANGLE_DEGREES)
+            self.anim_pacmanS[i] = gameobj.pygame.image.load(PACKMAN_SPRITES_FOLDER + "pacman.gif").convert_alpha()
+
+        # Initialize default one.
+        self.anim_pacmanCurrent = self.anim_pacmanR
 
     @property
     def pos(self):
@@ -37,14 +56,25 @@ class Packman(gameobj.GameObj):
         self.move(key)
 
     def _change_direction(self, key):
-        if key[gameobj.pygame.K_LEFT]:
-            self.image = self.image_left
-        elif key[gameobj.pygame.K_RIGHT]:
-            self.image = self.image_right
-        elif key[gameobj.pygame.K_UP]:
-            self.image = self.image_up
-        elif key[gameobj.pygame.K_DOWN]:
-            self.image = self.image_down
+        # set the current frame array to match the direction pacman is facing
+        if self.change_x > 0:
+            self.anim_pacmanCurrent = self.anim_pacmanR
+        elif self.change_x < 0:
+            self.anim_pacmanCurrent = self.anim_pacmanL
+        elif self.change_y > 0:
+            self.anim_pacmanCurrent = self.anim_pacmanD
+        elif self.change_y < 0:
+            self.anim_pacmanCurrent = self.anim_pacmanU
+
+        self.image = self.anim_pacmanCurrent[ self.animFrame ]
+        
+        if not self.change_x == 0 or not self.change_y == 0:
+            # only Move mouth when pacman is moving
+            self.animFrame += 1 
+        
+        if self.animFrame == 9:
+            # wrap to beginning
+            self.animFrame = 1
 
     def _collide_with_pellets(self):
         pellets = gameobj.pygame.sprite.spritecollide(self, self.pellets, True)
