@@ -20,8 +20,8 @@ class Packman(gameobj.GameObj):
         self.animFrame         = ANIMATION_FRAME_DEFAULT
 
         # Set speed vector
-        self.change_x          = ZERO
-        self.change_y          = ZERO
+        self.velX          = ZERO
+        self.velY          = ZERO
 
     def _set_images(self):
 
@@ -48,8 +48,8 @@ class Packman(gameobj.GameObj):
         
     def changespeed(self, x, y):
         """ Change the speed of the player. """
-        self.change_x += x
-        self.change_y += y
+        self.velX += x
+        self.velY += y
 
     def update(self):
         key = gameobj.pygame.key.get_pressed()
@@ -57,18 +57,18 @@ class Packman(gameobj.GameObj):
 
     def _change_direction(self, key):
         # set the current frame array to match the direction pacman is facing
-        if self.change_x > 0:
+        if self.velX > 0:
             self.anim_pacmanCurrent = self.anim_pacmanR
-        elif self.change_x < 0:
+        elif self.velX < 0:
             self.anim_pacmanCurrent = self.anim_pacmanL
-        elif self.change_y > 0:
+        elif self.velY > 0:
             self.anim_pacmanCurrent = self.anim_pacmanD
-        elif self.change_y < 0:
+        elif self.velY < 0:
             self.anim_pacmanCurrent = self.anim_pacmanU
 
         self.image = self.anim_pacmanCurrent[ self.animFrame ]
         
-        if not self.change_x == 0 or not self.change_y == 0:
+        if not self.velX == 0 or not self.velY == 0:
             # only Move mouth when pacman is moving
             self.animFrame += 1 
         
@@ -84,15 +84,15 @@ class Packman(gameobj.GameObj):
         self._change_direction(key)
 
         # Move left/right
-        self.rect.x += self.change_x
+        self.rect.x += self.velX
 
         self._collide_with_pellets()
 
-        self._collide_with_blocks_x(key)
+        self._collide_with_blocks_x()
  
         # Move up/down
-        self.rect.y += self.change_y
+        self.rect.y += self.velY
 
         self._collide_with_pellets()
         
-        self._collide_with_blocks_y(key)
+        self._collide_with_blocks_y()

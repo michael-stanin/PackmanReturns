@@ -48,10 +48,11 @@ class Game:
             for event in pygame.event.get():
                 self._on_event(event)
 
+            self._on_render()
+
             # Update all of the needed sprites
             self._on_loop()
 
-            self._on_render()
 
         # Close app.
         self._on_cleanup()
@@ -93,10 +94,15 @@ class Game:
         self.dirty_rects.update()
         self.dirty_rects.draw(self.screen)
 
+        pygame.sprite.spritecollide(self.packman, self.ghosts, False)
+
         pygame.display.flip()
 
     def _on_render(self):
-        pass
+        pos = self.packman.pos
+        for ghost in self.ghosts:
+            ghost.packman_pos = pos
+            ghost.draw(self.screen)
 
     def _on_cleanup(self):
         pygame.quit()
@@ -121,6 +127,7 @@ class Game:
         self.ghosts = pygame.sprite.Group()
         for x in [340, 370, 400, 430]:
             ghost = Blinky(x, 290, self.packman.pos)
+            ghost.blocks = self.blocks
 
             self.ghosts.add(ghost)
             self.dirty_rects.add(ghost)
