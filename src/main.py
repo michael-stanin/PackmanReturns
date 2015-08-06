@@ -26,10 +26,12 @@ HEIGHT                   = 640
 class Game:
 
     def __init__(self):
-        self.status      = True
-        self.size        = (WIDTH, HEIGHT)
-        self.caption     = CAPTION
-        self.dirty_rects = pygame.sprite.Group()
+        self.status          = True
+        self.size            = (WIDTH, HEIGHT)
+        self.caption         = CAPTION
+        self.dirty_rects     = pygame.sprite.Group()
+        self.limit_cells     = []
+        self.block_locations = []
 
     def start(self):
         self.layout = Layout(LEVEL_ONE_GRID_FOLDER)
@@ -37,6 +39,8 @@ class Game:
         self._init_pygame()
 
         self._load_sprites()
+
+        self._fill_limit_cells()
 
         clock = pygame.time.Clock()        
 
@@ -143,9 +147,11 @@ class Game:
                           int(line[1]),
                           int(line[2]),
                           int(line[3]))
+
+            self.limit_cells.append((block.rect.topleft, block.rect.bottomright))
+
             self.blocks.add(block)
             self.dirty_rects.add(block)
-
 
     def _load_pellets(self):
         self.pellets = pygame.sprite.Group()
@@ -159,6 +165,15 @@ class Game:
             self.pellets.add(pellet)
             self.dirty_rects.add(pellet)
 
+    def _fill_limit_cells(self):
+        for pair in self.limit_cells:
+            self._fill_limit_cell(pair)
+
+    def _fill_limit_cell(self, pair):
+        #include the border cases
+        for x in range(pair[0][0], pair[1][0] + 1):
+            for y in range(pair[0][1], pair[1][1] + 1): 
+                self.block_locations.append((x,y))
 
 game = Game()
 game.start()
